@@ -15,6 +15,16 @@ def get_play_by_play(year, url='https://github.com/guga31bb/nflfastR-data/blob/m
                compression='gzip', low_memory=False)
      return data
 
+def get_geo_coordinates(city_name, base_url='http://api.openweathermap.org/geo/1.0/direct?q='):
+    '''
+    http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}
+    :param city_name:
+    :param url:
+    :return:
+    '''
+    url = base_url + city_name + '&limit=1&appid=' + api_key
+    json = requests.get(url).json()[0]
+    return str(json['lat']), str(json['lon'])
 
 def get_current_weather_city(city_name, base_url= 'http://api.openweathermap.org/data/2.5/weather?'):
     '''
@@ -28,11 +38,12 @@ def get_current_weather_city(city_name, base_url= 'http://api.openweathermap.org
     :return:
     '''
     url = base_url + "appid=" + api_key + "&q=" + city_name
-    response = requests.get(url)
-    return response.json()
+    json = requests.get(url).json()
+    return json
 
 
-def get_5_day_forecast_lat_lon(lat, lon, base_url='http://api.openweathermap.org/data/2.5/forecast?'):
+def get_5_day_forecast_city(city_name, base_url='http://api.openweathermap.org/data/2.5/forecast?'):
+    lat, lon = get_geo_coordinates(city_name)
     url = base_url + "lat=" + lat + "&lon=" + lon + "&appid=" + api_key
     response = requests.get(url)
     return response.json()
@@ -56,6 +67,5 @@ def write_year_to_csv(year):
 
 
 if __name__ == "__main__":
-    #TODO add coordinate change api
-    write_year_to_csv('2021')
-    print(get_5_day_forecast_lat_lon('47.5952', '122.3316'))
+    # write_year_to_csv('2021')
+    print(get_5_day_forecast_city('Seattle'))
