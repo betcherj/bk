@@ -15,6 +15,7 @@ def get_play_by_play(year, url='https://github.com/guga31bb/nflfastR-data/blob/m
                compression='gzip', low_memory=False)
      return data
 
+
 def get_geo_coordinates(city_name, base_url='http://api.openweathermap.org/geo/1.0/direct?q='):
     '''
     http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}
@@ -51,21 +52,38 @@ def get_5_day_forecast_city(city_name, base_url='http://api.openweathermap.org/d
 
 def write_year_to_csv(year):
     data = get_play_by_play(year)
-    # team_data = pd.DataFrame()
     teams = config['teams']
+    base_path = os.path.dirname(os.path.abspath(os.curdir)) + "/data/" + str(year)
+    if not os.path.exists(base_path):
+        os.makedirs(base_path)
     for team in teams:
         print("Writing Data for " + team)
-        path = os.path.dirname(os.path.abspath(os.curdir)) + "/data/" + str(year) + '/' + team
-        if not os.path.exists(path):
-            os.makedirs(path)
+        path = base_path + '/' + team
+        team_games = data.loc[(data["home_team"] == team) | (data["away_team"] == team)]
+        team_games.to_csv(path)
 
-        team_home_games = data.loc[data["home_team"] == team]
-        team_home_games.to_csv(path + "/home_pbp")
+    print("Completed writing data for " + str(year))
 
-        team_away_games = data.loc[data["away_team"] == team]
-        team_away_games.to_csv(path + "/away_pbp")
+def get_csv(year, team, datetime_col = None, idx_col= None):
+    path = os.path.dirname(os.path.abspath(os.curdir)) + "/data/" + str(year) + '/' + str(team)
+    if not os.path.exists(path):
+        print("CSV does not exist")
+        return None
+    return pd.read_csv(path)
+
+
+def create_rolling_features(df,
+                            feature,
+                            agg_method,
+                            window_size):
+    if agg_method == 'sum':
+        df['sum_' + feature + '_' + str(window_size)] = df[feature].rolling(window=window_size).sum()
+    elif agg_method == 'mean':
+        df['mean_' + feature + '_' + str(window_size)] = df[feature].rolling(window=window_size).mean()
+    return df
 
 
 if __name__ == "__main__":
-    # write_year_to_csv('2021')
-    print(get_5_day_forecast_city('Seattle'))
+    # df = get_csv(2021, 'ATL.csv')
+    # df = create_rolling_features(df, 'yards_gained', 'mean', 20)
+    # print(df['mean_yards_gained_' + '20'][40:80])

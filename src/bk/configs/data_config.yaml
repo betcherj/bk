@@ -2,5 +2,5 @@ api_keys:
   open_weather: '92196f9d60ee3e80b8aa418c7b217d19'
 
 teams: [ 'SF', 'DET', 'BAL', 'LA', 'MIN' ,'KC', 'JAX', 'CIN', 'CAR', 'NE', 'BUF', 'WAS', 'NYG',
-    'ATL', 'NO', 'DEN', 'DAL', 'HOU', 'MIA', 'TB', 'CLE', 'PIT', 'GB', 'TEN', 'LAC',
+    'ATL.csv', 'NO', 'DEN', 'DAL', 'HOU', 'MIA', 'TB', 'CLE', 'PIT', 'GB', 'TEN', 'LAC',
     'PHI', 'IND', 'SEA', 'LV', 'CHI', 'NYJ', 'ARI' ]
