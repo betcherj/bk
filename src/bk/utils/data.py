@@ -10,7 +10,7 @@ config = read_yaml(os.path.abspath(os.pardir + "/configs/data_config.yaml"))
 api_key = config['api_keys']['open_weather']
 
 def get_distance(coords_x, coords_y):
-    return distance(coords_x, coords_y)
+    return distance(coords_x, coords_y).km
 
 
 def get_play_by_play(year, url='https://github.com/guga31bb/nflfastR-data/blob/master/data/'):
