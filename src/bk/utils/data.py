@@ -1,4 +1,5 @@
 import pandas as pd
+from geopy.distance import distance
 import requests
 import json
 import os
@@ -7,6 +8,9 @@ from bk.utils.config import read_yaml
 
 config = read_yaml(os.path.abspath(os.pardir + "/configs/data_config.yaml"))
 api_key = config['api_keys']['open_weather']
+
+def get_distance(coords_x, coords_y):
+    return distance(coords_x, coords_y)
 
 
 def get_play_by_play(year, url='https://github.com/guga31bb/nflfastR-data/blob/master/data/'):
@@ -87,3 +91,8 @@ if __name__ == "__main__":
     # df = get_csv(2021, 'ATL.csv')
     # df = create_rolling_features(df, 'yards_gained', 'mean', 20)
     # print(df['mean_yards_gained_' + '20'][40:80])
+    coords_x = get_geo_coordinates("Seattle")
+    coords_y = get_geo_coordinates("Boston")
+    print(get_distance(coords_x, coords_y))
+    pass
+
