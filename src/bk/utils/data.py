@@ -68,7 +68,7 @@ def write_year_to_csv(year):
 
     print("Completed writing data for " + str(year))
 
-def get_csv(year, team, datetime_col = None, idx_col= None):
+def get_pd_from_csv(year, team, datetime_col = None, idx_col= None):
     path = os.path.dirname(os.path.abspath(os.curdir)) + "/data/" + str(year) + '/' + str(team)
     if not os.path.exists(path):
         print("CSV does not exist")
@@ -88,7 +88,7 @@ def create_rolling_features(df,
 
 
 if __name__ == "__main__":
-    # df = get_csv(2021, 'ATL.csv')
+    # df = get_pd_from_csv(2021, 'ATL.csv')
     # df = create_rolling_features(df, 'yards_gained', 'mean', 20)
     # print(df['mean_yards_gained_' + '20'][40:80])
     coords_x = get_geo_coordinates("Seattle")

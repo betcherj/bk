@@ -3,8 +3,7 @@
 class Team():
     def __init__(self, name):
         self.name = name
-        self.schedule = []
-        self.stats_vector = []
+        self.team_df = None
 
     def get_game_stats(self, game):
         pass
