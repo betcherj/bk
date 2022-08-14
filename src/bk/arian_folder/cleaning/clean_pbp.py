@@ -1,27 +1,56 @@
 import pandas as pd
 import numpy as np
+import os
+import re
 
-schedule = pd.read_csv('static_data/Schedule.csv')
-pbp = pd.read_csv('static_data/pbp21.csv')
+def get_wind_speed(weather_info):
+    speed = re.findall("\d+", weather_info.lower().split("wind: ")[1])
+    if not speed:
+        return None
+    return speed[0]
 
-# Add roof and surface when NA
+def get_wind_direction(weather_info):
+    return re.sub('[^a-zA-Z]+',"", weather_info.lower().split("wind: ")[1].split("mph")[0])
 
-schedule = schedule[['game_id','roof','surface']]
-pbp = pbp.merge(schedule, on = 'game_id')
-pbp.roof_x.fillna(pbp.roof_y, inplace=True)
-del pbp['roof_y']
-pbp.surface_x.fillna(pbp.surface_y, inplace=True)
-del pbp['surface_y']
-pbp = pbp.rename(columns={'roof_x': 'roof', 'surface_x': 'surface'})
+def clean_weather_data(pbp):
+    weather_df = pbp.groupby(['game_id'])['weather'].apply(np.random.choice).reset_index()
 
-### Remove Clock Plays###
-pbp = pbp[pbp['qb_spike'] == 0]
-pbp = pbp[pbp['qb_kneel'] == 0]
+    weather_df['tempature'] = weather_df['weather'].str.split('°').str[0].str[-3:]
 
-### Clean weather columns
-weather_df = pbp.groupby(['game_id'])['weather'].apply(np.random.choice).reset_index()
+    weather_df['rain'] = weather_df['weather'].str.contains('rain', case=False)
 
+    weather_df['wind_speed'] = weather_df['weather'].apply(get_wind_speed)
 
+    weather_df['wind_direction'] = weather_df['weather'].apply(get_wind_direction)
+
+    weather_df['snow'] = weather_df['weather'].str.contains('snow', case=False)
+
+    weather_df = weather_df.drop(columns='weather')
+
+    return weather_df
+
+if __name__ == "__main__":
+    schedule = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + '/static_data/Schedule.csv')
+    pbp = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + '/static_data/pbp21.csv')
+
+    # Add roof and surface when NA
+
+    schedule = schedule[['game_id', 'roof', 'surface']]
+    pbp = pbp.merge(schedule, on='game_id')
+    pbp.roof_x.fillna(pbp.roof_y, inplace=True)
+    del pbp['roof_y']
+    pbp.surface_x.fillna(pbp.surface_y, inplace=True)
+    del pbp['surface_y']
+    pbp = pbp.rename(columns={'roof_x': 'roof', 'surface_x': 'surface'})
+
+    ### Remove Clock Plays###
+    pbp = pbp[pbp['qb_spike'] == 0]
+    pbp = pbp[pbp['qb_kneel'] == 0]
+
+    ### Clean weather columns
+    weather_df = pbp.groupby(['game_id'])['weather'].apply(np.random.choice).reset_index()
+
+    clean_weather_df = clean_weather_data(pbp)
 
 #
 # Kneel <- "Rain"

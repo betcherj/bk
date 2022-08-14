@@ -88,11 +88,11 @@ def create_rolling_features(df,
 
 
 if __name__ == "__main__":
-    # df = get_pd_from_csv(2021, 'ATL.csv')
+    df = get_pd_from_csv(2021, 'ATL.csv')
     # df = create_rolling_features(df, 'yards_gained', 'mean', 20)
     # print(df['mean_yards_gained_' + '20'][40:80])
-    coords_x = get_geo_coordinates("Seattle")
-    coords_y = get_geo_coordinates("Boston")
-    print(get_distance(coords_x, coords_y))
-    pass
+    # coords_x = get_geo_coordinates("Seattle")
+    # coords_y = get_geo_coordinates("Boston")
+    # print(get_distance(coords_x, coords_y))
+    df.display(5)
 
