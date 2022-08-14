@@ -81,18 +81,33 @@ def create_rolling_features(df,
                             agg_method,
                             window_size):
     if agg_method == 'sum':
-        df['sum_' + feature + '_' + str(window_size)] = df[feature].rolling(window=window_size).sum()
+        df['sum_' + feature + '_' + str(window_size)] = df[feature].rolling(window=window_size, min_periods=1).sum()
     elif agg_method == 'mean':
-        df['mean_' + feature + '_' + str(window_size)] = df[feature].rolling(window=window_size).mean()
+        df['mean_' + feature + '_' + str(window_size)] = df[feature].rolling(window=window_size, min_periods=1).mean()
     return df
 
+def get_rolling_pass_success_df():
+    path = "/Users/betcherjack/bk/src/bk/arian_folder/processed_data/pass_success.csv"
+    pass_success_df = pd.read_csv(path)
+    teams = pass_success_df['posteam'].unique().tolist()
+    features = ['pass_success', 'pass_count', 'expected_success']
+
+    all_teams_df = pd.DataFrame(columns=pass_success_df.columns)
+
+    print(teams)
+    for team in teams:
+        team_df = pass_success_df[pass_success_df['posteam'].str.contains(team)]
+        for feature in features:
+            all_teams_df = pd.concat([all_teams_df, create_rolling_features(team_df, feature, agg_method='sum', window_size=8)])
+            all_teams_df = pd.concat([all_teams_df, create_rolling_features(team_df, feature, agg_method='mean', window_size=8)])
+    return all_teams_df
 
 if __name__ == "__main__":
-    df = get_pd_from_csv(2021, 'ATL.csv')
+    # df = get_pd_from_csv(2021, 'ATL.csv')
     # df = create_rolling_features(df, 'yards_gained', 'mean', 20)
     # print(df['mean_yards_gained_' + '20'][40:80])
     # coords_x = get_geo_coordinates("Seattle")
     # coords_y = get_geo_coordinates("Boston")
     # print(get_distance(coords_x, coords_y))
-    df.display(5)
-
+    rolling_pass_success_df = get_rolling_pass_success_df()
+    rolling_pass_success_df.to_csv("/Users/betcherjack/bk/src/bk/arian_folder/processed_data/rolling_pass_success.csv")
