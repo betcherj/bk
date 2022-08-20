@@ -87,7 +87,7 @@ def create_rolling_features(df,
     return df
 
 def get_rolling_pass_success_df():
-    path = "/Users/betcherjack/bk/src/bk/arian_folder/processed_data/pass_success.csv"
+    path = "/bk/processed_data/pass_success.csv"
     pass_success_df = pd.read_csv(path)
     teams = pass_success_df['posteam'].unique().tolist()
     features = ['pass_success', 'pass_count', 'expected_success']

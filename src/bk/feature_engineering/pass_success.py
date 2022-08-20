@@ -7,7 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
 from sklearn.metrics import roc_auc_score
 
-pbp = pd.read_csv( os.path.dirname(os.path.abspath(os.curdir)) + '/static_data/pbp21.csv')
+pbp = pd.read_csv( os.path.dirname(os.path.abspath(os.curdir)) + '/data/pbp21.csv')
 pass_data = pbp[pbp['play_type'] == "pass"]
 pass_data['pass_count'] = 1
 pass_data = pass_data[pass_data['success'].notna()]
