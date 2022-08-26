@@ -3,14 +3,21 @@ import numpy as np
 import os
 import re
 
+
 def get_wind_speed(weather_info):
-    speed = re.findall("\d+", weather_info.lower().split("wind: ")[1])
+    if not weather_info or "wind: " not in str(weather_info):
+        return None
+    speed = re.findall("\d+", str(weather_info).lower().split("wind: ")[1])
     if not speed:
         return None
-    return speed[0]
+    if type(speed) == list:
+        return speed[0]
+    return speed
 
 def get_wind_direction(weather_info):
-    return re.sub('[^a-zA-Z]+',"", weather_info.lower().split("wind: ")[1].split("mph")[0])
+    if not weather_info or "wind: " not in str(weather_info):
+        return 'na'
+    return re.sub('[^a-zA-Z]+',"", str(weather_info).lower().split("wind: ")[1].split("mph")[0])
 
 def clean_weather_data(pbp):
     weather_df = pbp.groupby(['game_id'])['weather'].apply(np.random.choice).reset_index()
@@ -30,8 +37,9 @@ def clean_weather_data(pbp):
     return weather_df
 
 if __name__ == "__main__":
-    schedule = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + '/static_data/Schedule.csv')
-    pbp = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + '/static_data/pbp21.csv')
+    print(os.path.dirname(os.path.abspath(os.curdir)) + '/data/Schedule.csv')
+    schedule = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + '/data/Schedule.csv')
+    pbp = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + '/data/pbp_full.csv')
 
     # Add roof and surface when NA
 
@@ -51,6 +59,11 @@ if __name__ == "__main__":
     weather_df = pbp.groupby(['game_id'])['weather'].apply(np.random.choice).reset_index()
 
     clean_weather_df = clean_weather_data(pbp)
+
+    out_path = os.path.dirname(os.path.abspath(os.curdir)) + '/processed_data/clearn_weather.csv'
+    clean_weather_df.to_csv(out_path, na_rep='null')
+
+
 
 #
 # Kneel <- "Rain"
