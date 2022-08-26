@@ -15,7 +15,8 @@ def get_wind_speed(weather_info):
 def get_wind_direction(weather_info):
     if not weather_info or weather_info == "null" or 'wind: ' not in str(weather_info).lower():
         return None
-    return re.sub('[^a-zA-Z]+',"", str(weather_info).lower().split("wind: ")[1].split("mph")[0])
+    return re.sub('[^a-zA-Z]+',"", str(weather_info).lower().split("wind: ")[1].split("mph")[0]).replace("south", "s").replace("north", "n").replace("west", "w").replace("east", "e")
+
 
 def clean_weather_data(pbp):
     weather_df = pbp.groupby(['game_id'])['weather'].apply(np.random.choice).reset_index()
