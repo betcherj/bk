@@ -16,7 +16,7 @@ def get_wind_speed(weather_info):
 
 def get_wind_direction(weather_info):
     if not weather_info or "wind: " not in str(weather_info):
-        return 'na'
+        return None
     return re.sub('[^a-zA-Z]+',"", str(weather_info).lower().split("wind: ")[1].split("mph")[0])
 
 def clean_weather_data(pbp):
@@ -58,10 +58,13 @@ if __name__ == "__main__":
     ### Clean weather columns
     weather_df = pbp.groupby(['game_id'])['weather'].apply(np.random.choice).reset_index()
 
-    clean_weather_df = clean_weather_data(pbp)
+    out_path = os.path.dirname(os.path.abspath(os.curdir)) + '/data/just_weather.csv'
+    weather_df.to_csv(out_path, na_rep='null')
 
-    out_path = os.path.dirname(os.path.abspath(os.curdir)) + '/processed_data/clearn_weather.csv'
-    clean_weather_df.to_csv(out_path, na_rep='null')
+    # clean_weather_df = clean_weather_data(pbp)
+    #
+    # out_path = os.path.dirname(os.path.abspath(os.curdir)) + '/processed_data/clean_weather.csv'
+    # clean_weather_df.to_csv(out_path, na_rep='null')
 
 
 
