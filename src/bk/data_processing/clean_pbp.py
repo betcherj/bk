@@ -5,24 +5,22 @@ import re
 
 
 def get_wind_speed(weather_info):
-    if not weather_info or "wind: " not in str(weather_info):
+    if not weather_info or weather_info == "null" or 'wind: ' not in str(weather_info).lower():
         return None
     speed = re.findall("\d+", str(weather_info).lower().split("wind: ")[1])
     if not speed:
         return None
-    if type(speed) == list:
-        return speed[0]
-    return speed
+    return speed[0]
 
 def get_wind_direction(weather_info):
-    if not weather_info or "wind: " not in str(weather_info):
+    if not weather_info or weather_info == "null" or 'wind: ' not in str(weather_info).lower():
         return None
     return re.sub('[^a-zA-Z]+',"", str(weather_info).lower().split("wind: ")[1].split("mph")[0])
 
 def clean_weather_data(pbp):
     weather_df = pbp.groupby(['game_id'])['weather'].apply(np.random.choice).reset_index()
 
-    weather_df['tempature'] = weather_df['weather'].str.split('°').str[0].str[-3:]
+    weather_df['temperature'] = weather_df['weather'].str.split('°').str[0].str[-3:]
 
     weather_df['rain'] = weather_df['weather'].str.contains('rain', case=False)
 
@@ -56,15 +54,15 @@ if __name__ == "__main__":
     pbp = pbp[pbp['qb_kneel'] == 0]
 
     ### Clean weather columns
-    weather_df = pbp.groupby(['game_id'])['weather'].apply(np.random.choice).reset_index()
+    weather_df = pbp.groupby(['game_id'])['weather'].apply(lambda x: x.notnull()).reset_index()
 
-    out_path = os.path.dirname(os.path.abspath(os.curdir)) + '/data/just_weather.csv'
-    weather_df.to_csv(out_path, na_rep='null')
+    # out_path = os.path.dirname(os.path.abspath(os.curdir)) + '/data/just_weather.csv'
+    # weather_df.to_csv(out_path, na_rep='null')
 
-    # clean_weather_df = clean_weather_data(pbp)
-    #
-    # out_path = os.path.dirname(os.path.abspath(os.curdir)) + '/processed_data/clean_weather.csv'
-    # clean_weather_df.to_csv(out_path, na_rep='null')
+    clean_weather_df = clean_weather_data(pbp)
+
+    out_path = os.path.dirname(os.path.abspath(os.curdir)) + '/processed_data/clean_weather.csv'
+    clean_weather_df.to_csv(out_path, na_rep='null')
 
 
 
