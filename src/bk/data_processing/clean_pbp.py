@@ -17,19 +17,24 @@ def get_wind_direction(weather_info):
         return None
     return re.sub('[^a-zA-Z]+',"", str(weather_info).lower().split("wind: ")[1].split("mph")[0]).replace("south", "s").replace("north", "n").replace("west", "w").replace("east", "e")
 
+def get_rain(weather_info):
+    return 'rain' in str(weather_info).lower() and not 'light' in str(weather_info).lower()
+
+def get_snow(weather_info):
+    return 'snow' in str(weather_info).lower() and not 'light' in str(weather_info).lower()
 
 def clean_weather_data(pbp):
     weather_df = pbp.groupby(['game_id'])['weather'].apply(np.random.choice).reset_index()
 
     weather_df['temperature'] = weather_df['weather'].str.split('°').str[0].str[-3:]
 
-    weather_df['rain'] = weather_df['weather'].str.contains('rain', case=False)
+    weather_df['rain'] = weather_df['weather'].apply(get_rain)
 
     weather_df['wind_speed'] = weather_df['weather'].apply(get_wind_speed)
 
     weather_df['wind_direction'] = weather_df['weather'].apply(get_wind_direction)
 
-    weather_df['snow'] = weather_df['weather'].str.contains('snow', case=False)
+    weather_df['snow'] = weather_df['weather'].apply(get_snow)
 
     weather_df = weather_df.drop(columns='weather')
 
