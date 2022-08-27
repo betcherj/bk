@@ -41,7 +41,6 @@ def clean_weather_data(pbp):
     return weather_df
 
 if __name__ == "__main__":
-    print(os.path.dirname(os.path.abspath(os.curdir)) + '/data/Schedule.csv')
     schedule = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + '/data/Schedule.csv')
     pbp = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + '/data/pbp_full.csv')
 
