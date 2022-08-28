@@ -12,7 +12,7 @@ def fourth_down_train_and_test(pbp):
 
   pbp['surface'] = pbp['surface'].astype('category')
 
-  pbp = pbp[pbp.select_dtypes(['category']).columns].apply(lambda x: x.cat.codes)
+  pbp['surface'] = pbp['surface'].apply(lambda x: x.cat.codes)
 
   X = pbp[['yardline_100','ydstogo','rain','snow','surface','wind_speed', 'wind_direction',
                         'half_seconds_remaining','qtr','score_differential','wp']]
