@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import pickle
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
@@ -9,9 +10,11 @@ def fourth_down_train_and_test(pbp):
   #Filter for fourth down calls only
   pbp = pbp[(pbp['down'] == 4)]
 
-  #Did they go for it
+  pbp['surface'] = pbp['surface'].astype('category')
 
-  X = pbp[['yardline_100','ydstogo','rain','snow','surface','wind', 'winddirection',
+  pbp = pbp[pbp.select_dtypes(['category']).columns].apply(lambda x: x.cat.codes)
+
+  X = pbp[['yardline_100','ydstogo','rain','snow','surface','wind_speed', 'wind_direction',
                         'half_seconds_remaining','qtr','score_differential','wp']]
 
   y = np.where(((pbp['play_type'] == "pass") | (pbp['play_type'] == "run")), 1, 0)
@@ -25,10 +28,18 @@ def fourth_down_train_and_test(pbp):
   score = model.score(X_test, y_test)
 
   print(f"Score of the model {score}.")
-  return model
+
+  out_path = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + '/models/fourth_down.sav')
+  print(f"Savining model to {out_path}")
+  pickle.dump(model, open(out_path, 'wb'))
+
 
 if __name__ == "__main__":
-  pbp = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + 'data/pbp_full.csv')
+  pbp = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + '/data/pbp_full.csv')
+
+  weather = pd.read_csv(os.path.dirname(os.path.abspath(os.curdir)) + '/processed_data/clean_weather.csv')
+
+  pbp = pd.merge(pbp, weather, on='game_id', how='left')
 
   model = fourth_down_train_and_test(pbp)
 
