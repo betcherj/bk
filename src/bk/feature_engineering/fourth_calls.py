@@ -7,12 +7,25 @@ from sklearn.model_selection import train_test_split
 
 
 def fourth_down_train_and_test(pbp):
-  #Filter for fourth down calls only
-  pbp = pbp[(pbp['down'] == 4)]
+  '''
+  Check for missing down or distance or NAs
+  Should we subset between certain win probability?
+  How to clean up half seconds remaining and win probability/score differential?
+  Can we include estimates on the team and opponent relative offense vs defense ability to improve model
+  The final "above expected features" should correlate better to future offensive points/ total game points
 
-  pbp['surface'] = pbp['surface'].astype('category')
+  :param pbp: play by play data
+  :return: a model with fourth down sucess rates
+  '''
 
-  pbp['surface'] = pbp['surface'].apply(lambda x: x.cat.codes)
+  pbp = pbp[(pbp['down'] == 4) & (pbp['surface'] != None)]
+
+  #Todo whats the best way to convert the surafe to numerical data ?
+  dummies = pd.get_dummies(pbp['surface'])
+
+  pbp = pd.concat([pbp, dummies], axis='columns')
+
+  pbp = pbp.drop(pd['surface'], axis='columns')
 
   X = pbp[['yardline_100','ydstogo','rain','snow','surface','wind_speed', 'wind_direction',
                         'half_seconds_remaining','qtr','score_differential','wp']]
@@ -42,14 +55,6 @@ if __name__ == "__main__":
   pbp = pd.merge(pbp, weather, on='game_id', how='left')
 
   model = fourth_down_train_and_test(pbp)
-
-
-
-# Check for missing down or distance or NAs
-# Should we subset between certain win probability?
-# How to clean up half seconds remaining and win probability/score differential?
-# Can we include estimates on the team and opponent relative offense vs defense ability to improve model
-# The final "above expected features" should correlate better to future offensive points/ total game points
 
 # Features to use:
 
